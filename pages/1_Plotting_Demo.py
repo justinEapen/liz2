@@ -3,8 +3,8 @@ import streamlit as st
 
 co = cohere.Client('18V1Oo06GAf0xMaXbBjkHlhdHktqbjc5tusZHZMV') # This is your trial API key
 
-import uuid
-conversation_id = str(uuid.uuid4())
+#import uuid
+#conversation_id = str(uuid.uuid4())
 
 st.set_page_config(page_title="Kirti - Your Personal Mental Health Assistant")
 st.title("Mental Health Bot")
@@ -73,7 +73,7 @@ def cohereReply(prompt):
             message=prompt,
             documents=docs,
             model='command',
-            conversation_id=conversation_id,
+            #conversation_id=conversation_id,
             preamble=preamble_prompt,
             chat_history=st.session_state.messages,
 
