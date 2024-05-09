@@ -1,3 +1,4 @@
+cohere
 altair
 numpy
 pandas
