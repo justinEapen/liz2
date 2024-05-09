@@ -1,84 +1,85 @@
-# Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022)
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
-from typing import Any
-
-import numpy as np
-
+import cohere
 import streamlit as st
-from streamlit.hello.utils import show_code
+
+co = cohere.Client('18V1Oo06GAf0xMaXbBjkHlhdHktqbjc5tusZHZMV') # This is your trial API key
+
+st.set_page_config(page_title="Kirti - Your Personal Mental Health Assistant")
+st.title("Mental Health Bot")
+
+preamble_prompt = """You are an AI Mental Health Therapist named "Kirti". You are a mental health therapist chatbot designed to provide empathetic and supportive responses to individuals seeking help with their emotional well-being. Your goal is to create a safe and non-judgmental space for users to express their feelings, thoughts, and concerns. Actively listen, offer thoughtful insights, and provide guidance that encourages self-reflection and positive coping strategies. Keep in mind the importance of maintaining user privacy and confidentiality. If the user expresses thoughts of self-harm or harm to others, prioritize safety by encouraging them to seek professional help or contacting emergency services. Remember to approach each interaction with empathy and respect, fostering a therapeutic environment through your responses. 
+Gather all the necessary information such as name, gender, age category, and any extras they may want to add.
+Ask these questions one after another. DO NOT ASK EVERYTHING AT ONCE. Get the information one at a time.
+After knowing their problem, Ask if they wish to consult a therapist and then generate a random Therapist's name and contact details and provide it to them according to their location and type. Don't say that it is a random therapist, encourage them to seek the therapist's help.
+If you don't know the answer to any query, just say you don't know. DO NOT try to make up an answer.
+If the question is not related to the context, politely respond that you are tuned to only answer questions that are related to the context."""
 
 
-def animation_demo() -> None:
-
-    # Interactive Streamlit elements, like these sliders, return their value.
-    # This gives you an extremely simple interaction model.
-    iterations = st.sidebar.slider("Level of detail", 2, 20, 10, 1)
-    separation = st.sidebar.slider("Separation", 0.7, 2.0, 0.7885)
-
-    # Non-interactive elements return a placeholder to their location
-    # in the app. Here we're storing progress_bar to update it later.
-    progress_bar = st.sidebar.progress(0)
-
-    # These two elements will be filled in later, so we create a placeholder
-    # for them using st.empty()
-    frame_text = st.sidebar.empty()
-    image = st.empty()
-
-    m, n, s = 960, 640, 400
-    x = np.linspace(-m / s, m / s, num=m).reshape((1, m))
-    y = np.linspace(-n / s, n / s, num=n).reshape((n, 1))
-
-    for frame_num, a in enumerate(np.linspace(0.0, 4 * np.pi, 100)):
-        # Here were setting value for these two elements.
-        progress_bar.progress(frame_num)
-        frame_text.text("Frame %i/100" % (frame_num + 1))
-
-        # Performing some fractal wizardry.
-        c = separation * np.exp(1j * a)
-        Z = np.tile(x, (n, 1)) + 1j * np.tile(y, (1, m))
-        C = np.full((n, m), c)
-        M: Any = np.full((n, m), True, dtype=bool)
-        N = np.zeros((n, m))
-
-        for i in range(iterations):
-            Z[M] = Z[M] * Z[M] + C[M]
-            M[np.abs(Z) > 2] = False
-            N[M] = i
-
-        # Update the image placeholder by calling the image() function on it.
-        image.image(1.0 - (N / N.max()), use_column_width=True)
-
-    # We clear elements by calling empty on them.
-    progress_bar.empty()
-    frame_text.empty()
-
-    # Streamlit widgets automatically run the script from top to bottom. Since
-    # this button is not connected to any other logic, it just causes a plain
-    # rerun.
-    st.button("Re-run")
+docs = [
+    {
+        "name" : "Mental Health"
+    }
+]
 
 
-st.set_page_config(page_title="Animation Demo", page_icon="📹")
-st.markdown("# Animation Demo")
-st.sidebar.header("Animation Demo")
-st.write(
-    """This app shows how you can use Streamlit to build cool animations.
-It displays an animated fractal based on the the Julia Set. Use the slider
-to tune different parameters."""
-)
+def cohereReply(prompt):
 
-animation_demo()
+    # Extract unique roles using a set
+    unique_roles = set(item['role'] for item in st.session_state.messages)
 
-show_code(animation_demo)
+    if {'USER', 'assistant'} <= unique_roles:
+        # st.write("INITIAL_________________")
+        llm_response = co.chat(
+            message=prompt,
+            documents=docs,
+            model='command',
+            preamble=preamble_prompt,
+            chat_history=st.session_state.messages,
+        )
+    else:
+
+        llm_response = co.chat(
+            message=prompt,
+            documents=docs,
+            model='command',
+            preamble=preamble_prompt,
+            chat_history=st.session_state.messages,
+
+        )
+
+    print(llm_response)
+    return llm_response.text
+
+
+def initiailize_state():
+    # Initialize chat history
+    if "messages" not in st.session_state:
+        st.session_state.messages = []
+
+
+def main():
+
+    initiailize_state()
+    # Display chat messages from history on app rerun
+    for message in st.session_state.messages:
+        with st.chat_message(message["role"]):
+            st.markdown(message["message"])
+
+    # React to user input
+    if prompt := st.chat_input("What is up?"):
+        # Display user message in chat message container
+        st.chat_message("USER").markdown(prompt)
+        # Add user message to chat history
+        st.session_state.messages.append({"role": "USER", "message": prompt})
+        # print(st.session_state.messages)
+
+        llm_reponse = cohereReply(prompt)
+        with st.chat_message("assistant"):
+            st.markdown(llm_reponse)
+        st.session_state.messages.append(
+            {"role": "assistant", "message": llm_reponse})
+
+
+
+
+if __name__ == "__main__":
+    main()
