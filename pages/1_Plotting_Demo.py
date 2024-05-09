@@ -35,7 +35,7 @@ Location (city or state)
 Preferred therapy style (e.g., CBT, mindfulness)
 Insurance information (optional)
 
-Matching & Disclaimer:
+Matching:
 Based on the provided information, generate contact details for therapists in their area and provide it to them.
 
 Always Here to Listen:
