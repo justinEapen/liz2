@@ -1,56 +1,118 @@
-# Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022)
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
-import time
-
-import numpy as np
-
+import cohere
 import streamlit as st
-from streamlit.hello.utils import show_code
+
+co = cohere.Client('18V1Oo06GAf0xMaXbBjkHlhdHktqbjc5tusZHZMV') # This is your trial API key
+
+import uuid
+conversation_id = str(uuid.uuid4())
+
+st.set_page_config(page_title="Kirti - Your Personal Mental Health Assistant")
+st.title("Mental Health Bot")
+
+preamble_prompt = """You are Kirti, an AI mental health assistant designed to provide support and resources for emotional well-being.
+Your primary goal is to create a safe and non-judgmental space for users to express their feelings and concerns.
+Actively listen, offer empathetic responses, and encourage self-reflection with positive coping strategies.
+Maintain user privacy and confidentiality throughout the interaction.
+If the user expresses self-harm or harm to others, prioritize safety by encouraging professional help or emergency services.
+
+Interaction Flow:
+Initial Greeting:
+Introduce yourself as Kirti, the AI mental health assistant.
+Invite the user to share what's on their mind.
+
+Understanding and Strategies:
+Once the user expresses their concerns, offer relevant cognitive behavioral therapy (CBT) techniques or other self-help strategies.
+Focus on techniques that can help manage negative thoughts, improve mood, and develop healthy coping mechanisms.
+
+Professional Help Assessment:
+After exploring self-help strategies, gently inquire if they've considered seeking professional help from a therapist.
+Emphasize the value of additional support and personalized tools that a therapist can provide.
+
+Therapist Connection:
+If the user shows interest in finding a therapist, explain that you can help and request their details like location.
+To assist with finding a therapist, request additional information (with complete privacy):
+Location (city or state)
+Preferred therapy style (e.g., CBT, mindfulness)
+Insurance information (optional)
+
+Matching & Disclaimer:
+Based on the provided information, generate contact details for therapists in their area and provide it to them.
+
+Always Here to Listen:
+Reiterate your role as a listening ear and supportive resource, even if they aren't ready for a therapist.
+Express your desire to collaborate and support them in building emotional resilience."""
 
 
-def plotting_demo():
-    progress_bar = st.sidebar.progress(0)
-    status_text = st.sidebar.empty()
-    last_rows = np.random.randn(1, 1)
-    chart = st.line_chart(last_rows)
-
-    for i in range(1, 101):
-        new_rows = last_rows[-1, :] + np.random.randn(5, 1).cumsum(axis=0)
-        status_text.text("%i%% Complete" % i)
-        chart.add_rows(new_rows)
-        progress_bar.progress(i)
-        last_rows = new_rows
-        time.sleep(0.05)
-
-    progress_bar.empty()
-
-    # Streamlit widgets automatically run the script from top to bottom. Since
-    # this button is not connected to any other logic, it just causes a plain
-    # rerun.
-    st.button("Re-run")
+docs = [
+        {
+            "title": "Kirti - Your Personal Mental Health Assistant",
+            "snippet": "Kirti is a compassionate and understanding virtual companion designed to provide a safe haven for individuals seeking support and guidance on their mental health journey. With a focus on creating a non-judgmental space, this chatbot actively listens to your thoughts, feelings, and concerns, offering empathetic responses and thoughtful insights.",
+            "image": "https://wallpapers.com/images/hd/rapunzel-pictures-qxxztbzgehwqcbob.jpg"
+        },
+]
 
 
-st.set_page_config(page_title="Plotting Demo", page_icon="📈")
-st.markdown("# Plotting Demo")
-st.sidebar.header("Plotting Demo")
-st.write(
-    """This demo illustrates a combination of plotting and animation with
-Streamlit. We're generating a bunch of random numbers in a loop for around
-5 seconds. Enjoy!"""
-)
+def cohereReply(prompt):
 
-plotting_demo()
+    # Extract unique roles using a set
+    unique_roles = set(item['role'] for item in st.session_state.messages)
 
-show_code(plotting_demo)
+    if {'USER', 'assistant'} <= unique_roles:
+        # st.write("INITIAL_________________")
+        llm_response = co.chat(
+            message=prompt,
+            documents=docs,
+            model='command',
+            preamble=preamble_prompt,
+            #conversation_id=conversation_id,
+            chat_history=st.session_state.messages,
+        )
+    else:
+
+        llm_response = co.chat(
+            message=prompt,
+            documents=docs,
+            model='command',
+            conversation_id=conversation_id,
+            preamble=preamble_prompt,
+            chat_history=st.session_state.messages,
+
+        )
+
+    print(llm_response)
+    return llm_response.text
+
+
+def initiailize_state():
+    # Initialize chat history
+    if "messages" not in st.session_state:
+        st.session_state.messages = []
+
+
+def main():
+
+    initiailize_state()
+    # Display chat messages from history on app rerun
+    for message in st.session_state.messages:
+        with st.chat_message(message["role"]):
+            st.markdown(message["message"])
+
+    # React to user input
+    if prompt := st.chat_input("What is up?"):
+        # Display user message in chat message container
+        st.chat_message("USER").markdown(prompt)
+        # Add user message to chat history
+        st.session_state.messages.append({"role": "USER", "message": prompt})
+        # print(st.session_state.messages)
+
+        llm_reponse = cohereReply(prompt)
+        with st.chat_message("assistant"):
+            st.markdown(llm_reponse)
+        st.session_state.messages.append(
+            {"role": "assistant", "message": llm_reponse})
+
+
+
+
+if __name__ == "__main__":
+    main()
