@@ -46,6 +46,12 @@ Express your desire to collaborate and support them in building emotional resili
 
 
 docs = [
+
+        {
+            "title": "Kirti - Your Personal Mental Health Assistant",
+            "snippet": "Kirti is a compassionate and understanding virtual companion designed to provide a safe haven for individuals seeking support and guidance on their mental health journey. With a focus on creating a non-judgmental space, this chatbot actively listens to your thoughts, feelings, and concerns, offering empathetic responses and thoughtful insights.",
+            "image": "https://wallpapers.com/images/hd/rapunzel-pictures-qxxztbzgehwqcbob.jpg"
+        },
         {
             "title": "The Tata Institute of Social Sciences (TISS) and Free Student Therapy The Tata Institute of Social Sciences (TISS)",
             "snippet": "The Tata Institute of Social Sciences (TISS) and Free Student Therapy The Tata Institute of Social Sciences (TISS) is a premier university in India, with a strong focus on mental health and well-being. Recognizing the pressures students face, TISS offers free individual counseling and developmental group activities through their Counselling Centre. Services Offered:  Individual Counselling:  Counsellors provide a safe and confidential space for students to discuss personal concerns, navigate academic challenges, and develop coping mechanisms.  Group Activities: Workshops are conducted on various topics related to mental health and personal growth, fostering a sense of community and shared experiences. Contact Information: The Counselling Centre is open six days a week with flexible hours to accommodate student schedules. However, you can find contact details for the Counselling Centre, including phone numbers and email addresses, on the TISS website under the  Student Support Services section: https://tiss.edu/view/6/counselling-centre/about-counselling-centre. Additional Support: TISS also offers free, confidential phone and email counseling services through their iCALL initiative (Initiating Concern for All). This can be a great resource for students seeking additional support or who prefer remote sessions. You can find more information about iCALL on the TISS website as well. Remember, seeking help is a sign of strength. TISS counsellors are there to support you and help you thrive during your academic journey.",
