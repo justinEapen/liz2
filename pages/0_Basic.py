@@ -63,7 +63,7 @@ def cohereReply(prompt):
     # Extract unique roles using a set
     unique_roles = set(item['role'] for item in st.session_state.messages)
 
-    if {'USER', 'assistant'} <= unique_roles:
+    if {'User', 'Chatbot'} <= unique_roles:
         # st.write("INITIAL_________________")
         response = co.chat(
             message=prompt,
