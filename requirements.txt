@@ -1,6 +1,6 @@
-cohere
+cohere==5.3.4
 altair
 numpy
 pandas
 pydeck
-streamlit
+streamlit==1.34.0
