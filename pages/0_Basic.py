@@ -106,16 +106,16 @@ def main():
     # React to user input
     if prompt := st.chat_input("What is up?"):
         # Display user message in chat message container
-        st.chat_message("USER").markdown(prompt)
+        st.chat_message("User").markdown(prompt)
         # Add user message to chat history
-        st.session_state.messages.append({"role": "USER", "message": prompt})
+        st.session_state.messages.append({"role": "User", "message": prompt})
         # print(st.session_state.messages)
 
         response = cohereReply(prompt)
-        with st.chat_message("assistant"):
+        with st.chat_message("Chatbot"):
             st.markdown(response)
         st.session_state.messages.append(
-            {"role": "assistant", "message": response})
+            {"role": "Chatbot", "message": response})
 
 
 
