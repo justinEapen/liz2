@@ -65,7 +65,7 @@ def cohereReply(prompt):
 
     if {'USER', 'assistant'} <= unique_roles:
         # st.write("INITIAL_________________")
-        llm_response = co.chat(
+        response = co.chat(
             message=prompt,
             documents=docs,
             model='command',
@@ -75,7 +75,7 @@ def cohereReply(prompt):
         )
     else:
 
-        llm_response = co.chat(
+        response = co.chat(
             message=prompt,
             documents=docs,
             model='command',
@@ -85,8 +85,8 @@ def cohereReply(prompt):
 
         )
 
-    print(llm_response)
-    return llm_response.text
+    print(response)
+    return response.text
 
 
 def initiailize_state():
@@ -111,11 +111,11 @@ def main():
         st.session_state.messages.append({"role": "USER", "message": prompt})
         # print(st.session_state.messages)
 
-        llm_reponse = cohereReply(prompt)
+        response = cohereReply(prompt)
         with st.chat_message("assistant"):
-            st.markdown(llm_reponse)
+            st.markdown(response)
         st.session_state.messages.append(
-            {"role": "assistant", "message": llm_reponse})
+            {"role": "assistant", "message": response})
 
 
 
